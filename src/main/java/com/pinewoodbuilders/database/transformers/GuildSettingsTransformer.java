@@ -26,6 +26,7 @@ import com.pinewoodbuilders.Xeus;
 import com.pinewoodbuilders.contracts.database.transformers.Transformer;
 import com.pinewoodbuilders.database.collection.DataRow;
 import com.pinewoodbuilders.database.controllers.GlobalSettingsController;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -95,6 +96,8 @@ public class GuildSettingsTransformer extends Transformer {
     private long rewardRequestChannelId;
     private boolean isLeadershipServer;
 
+    private JSONObject evaluationSettings = null;
+
     public GuildSettingsTransformer(DataRow data) {
         super(data);
 
@@ -151,6 +154,8 @@ public class GuildSettingsTransformer extends Transformer {
 
             rewardRequestChannelId = data.getLong("reward_request_channel_id");
             isLeadershipServer = data.getBoolean("leadership_server");
+
+            evaluationSettings = new JSONObject(data.getString("evaluation_settings"));
 
             if (data.getString("moderator_roles", null) != null) {
                 List <String> moderatorRoles = Xeus.gson.fromJson(
@@ -659,5 +664,13 @@ public class GuildSettingsTransformer extends Transformer {
 
     public void setLeadershipServer(boolean leadershipServer) {
         isLeadershipServer = leadershipServer;
+    }
+
+    public JSONObject getEvaluationSettings() {
+        return evaluationSettings;
+    }
+
+    public void setEvaluationSettings(JSONObject evaluationSettings) {
+        this.evaluationSettings = evaluationSettings;
     }
 }
