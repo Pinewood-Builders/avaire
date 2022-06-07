@@ -1,6 +1,5 @@
 package com.pinewoodbuilders.contracts.roblox.evaluations;
 
-import com.pinewoodbuilders.Xeus;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -19,12 +18,16 @@ public class EvaluationSettings {
     }
 
     private JSONObject initEvals(JSONObject evaluations) {
-        HashMap<String, String> map = new HashMap<>();
-        if (evaluations.) {
-            return new JSONObject(Xeus.gson.toJson(map));
+        HashMap<String, Object> map = new HashMap<>();
+        if (!evaluations.has("settings")) {
+            map.put("active", false);
+            return new JSONObject(map);
         }
 
+        map.put("active", true);
+        map.put("settings", evaluations.getJSONArray("settings"));
 
+    return null;
     }
 
 }
