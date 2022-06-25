@@ -1,20 +1,20 @@
 /*
  * Copyright (c) 2018.
  *
- * This file is part of AvaIre.
+ * This file is part of Xeus.
  *
- * AvaIre is free software: you can redistribute it and/or modify
+ * Xeus is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * AvaIre is distributed in the hope that it will be useful,
+ * Xeus is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with AvaIre.  If not, see <https://www.gnu.org/licenses/>.
+ * along with Xeus.  If not, see <https://www.gnu.org/licenses/>.
  *
  *
  */
@@ -22,6 +22,7 @@
 package com.avairebot.chat;
 
 import com.avairebot.BaseTest;
+import com.pinewoodbuilders.chat.PlaceholderMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.junit.Test;
@@ -83,12 +84,12 @@ public class PlaceholderMessageTests extends BaseTest {
     @Test
     public void testTitleIsSetWithUrlCorrectly() {
         PlaceholderMessage message = createWith(null);
-        message.setTitle("Some weird Title", "https://avairebot.com/");
+        message.setTitle("Some weird Title", "https://xeus.pinewood-builders.com/");
 
         MessageEmbed embed = message.buildEmbed();
 
         assertEquals("Some weird Title", embed.getTitle());
-        assertEquals("https://avairebot.com/", embed.getUrl());
+        assertEquals("https://xeus.pinewood-builders.com/", embed.getUrl());
     }
 
     @Test
@@ -160,24 +161,24 @@ public class PlaceholderMessageTests extends BaseTest {
     @Test
     public void testAuthorIsSetWithoutIconCorrectly() {
         PlaceholderMessage message = createWith(null);
-        message.setAuthor("Senither", "https://avairebot.com/");
+        message.setAuthor("Senither", "https://xeus.pinewood-builders.com/");
 
         MessageEmbed embed = message.buildEmbed();
 
         assertEquals("Senither", embed.getAuthor().getName());
-        assertEquals("https://avairebot.com/", embed.getAuthor().getUrl());
+        assertEquals("https://xeus.pinewood-builders.com/", embed.getAuthor().getUrl());
         assertEquals(null, embed.getAuthor().getIconUrl());
     }
 
     @Test
     public void testAuthorIsSetCorrectly() {
         PlaceholderMessage message = createWith(null);
-        message.setAuthor("Senither", "https://avairebot.com/", "https://i.imgur.com/odFyo1Q.gif");
+        message.setAuthor("Senither", "https://xeus.pinewood-builders.com/", "https://i.imgur.com/odFyo1Q.gif");
 
         MessageEmbed embed = message.buildEmbed();
 
         assertEquals("Senither", embed.getAuthor().getName());
-        assertEquals("https://avairebot.com/", embed.getAuthor().getUrl());
+        assertEquals("https://xeus.pinewood-builders.com/", embed.getAuthor().getUrl());
         assertEquals("https://i.imgur.com/odFyo1Q.gif", embed.getAuthor().getIconUrl());
     }
 

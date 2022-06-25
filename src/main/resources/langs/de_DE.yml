@@ -10,7 +10,7 @@ errors:
   cantMentionEveryone: "Du hast nicht die Berechtigung, alle zu erwähnen."
   cantMentionUsersOrRoles: "Dir fehlt die Berechtigung zur Nutzung des Befehls zum Erwähnen von Usern oder Rollen."
   requireLevelFeatureToBeEnabled: 'Dieser Befehl benötigt das `Levels & Experience` Feature. Du kannst den Server-Administrator anfragen, ob dieser damit einverstanden ist diesen mit folgendem Befehl zu aktivieren: `{0}`'
-  errorOccurredWhileLoading: 'Ein Fehler ist beim Laden von {0} aufgetreten. Bitte versuche es später erneut. Sollte dieser Fehler erneut auftreten, so kontaktiere eines unserer Entwickler auf dem [AvaIre Support Server] [https://avairebot.com/support].'
+  errorOccurredWhileLoading: 'Ein Fehler ist beim Laden von {0} aufgetreten. Bitte versuche es später erneut. Sollte dieser Fehler erneut auftreten, so kontaktiere eines unserer Entwickler auf dem [Xeus Support Server] [https://discord.gg/SUPJEt3Ma9].'
 levelupMessages:
   - "GG :user, du hast soeben **Level :level** erreicht!"
   - "Eyy :user, du bist soeben aufgestiegen! Du bist nun auf **Level :level**."
@@ -82,7 +82,7 @@ administration:
     invalidAmountGiven: "Die Eigenschaft `amount` muss zwischen 1 und {0} sein, um XP von einem Benutzer hinzuzufügen oder zu nehmen."
     aboutToResetEverything: "Du bist dabei die XP für alle auf dem gesamten Server zurückzusetzen. Wenn du sicher bist, dass du fortfahren willst, führe den Befehl aus, um die Server XP komplett zurückzusetzen.\n\n```:command server-reset :token```\nDieser Befehl funktioniert nur für 60 Sekunden. danach wird das Token ungültig und das Kommando muss erneut ausgeführt werden, um einen neuen Token zu erhalten."
     aboutToSyncEverything: "Du bist dabei, die XP mit der globalen Rangliste zu synchronisieren. Das wird effektiv alle benutzerdefinierten XP-Änderungen auf dem gesamten Server rückgängig machen. Wenn Du sicher bist, dass Du trotzdem fortfahren willst, führe den Befehl aus, um die Server XP komplett zu synchronisieren.\n\n```:command server-sync :token`\nDieser Befehl funktioniert nur für 60 Sekunden, danach wird der Token ungültig und der Befehl muss erneut ausgeführt werden, um einen neuen Token zu erhalten."
-    failedToSaveChanges: "Fehler beim Versuch die Änderungen in der Datenbank zu speichern. Bitte versuche es erneut. Bei weiterem Misslingen bitten wir dich uns auf unserem offiziellen Discordserver zu kontaktieren: [AvaIre support server](https://avairebot.com/support)"
+    failedToSaveChanges: "Fehler beim Versuch die Änderungen in der Datenbank zu speichern. Bitte versuche es erneut. Bei weiterem Misslingen bitten wir dich uns auf unserem offiziellen Discordserver zu kontaktieren: [Xeus support server](https://avairebot.com/support)"
     mustBeAnAdmin: "Du musst Serveradmin sein, um diese Aktion ausführen zu können."
     invalidSecurityToken: "Ungültiger Sicherheitsschlüssel angegeben. Bitte gebe den korrekten Schlüssel ein, um die XP von allen Servern zurückzusetzen."
     warning: "Warnung!"
@@ -136,7 +136,7 @@ administration:
     invalidChannel: "Ungültigen Channel angegeben. Der Channel muss ein gültiger Textchannel sein."
     cantTalkInChannel: "Ich kann nicht im Channel {0} nicht schreiben. Daher wird keiner für das Schreiben in dem Channel belohnt. Wenn du möchtest, dass ich anderen dafür XP gebe, bitte teile mir die Berechtigung zum Senden von Nachrichten zu."
     noChannelsWithRewardsDisabled: "Es gibt derzeit keine Channels mit dem Level Rewards, die deaktiviert sind. Du kannst welche mit dem `{0} <channel>` Befehl hinzufügen."
-    failedToUpdate: "Fehler beim Versuch die Änderungen in der Datenbank zu speichern. Bitte versuche es erneut. Bei weiterem Misslingen bitten wir dich uns auf unserem offiziellen Discordserver zu kontaktieren: [AvaIre support server](https://avairebot.com/support)"
+    failedToUpdate: "Fehler beim Versuch die Änderungen in der Datenbank zu speichern. Bitte versuche es erneut. Bei weiterem Misslingen bitten wir dich uns auf unserem offiziellen Discordserver zu kontaktieren: [Xeus support server](https://avairebot.com/support)"
     listChannels: "Alle unten erwähnten Channels haben derzeit Level Rewards deaktiviert. Jeder Channel, der nicht in der Liste steht, ist unbetroffen. \n\n:channels"
     listChannelsTitle: "Channels mit Level Rewards deaktivert ({0})"
     success: "Die XP Rewards für den :channel Channel wurden **:status**!"
@@ -176,7 +176,7 @@ administration:
   LanguageCommand:
     invalidLanguageCode: "Ungültiger Locale angegeben. `{0}` ist kein gültiger Locale oder wird derzeit nicht unterstützt."
     changed: "Die Serversprache wurde erfolgreich aktualisiert. Nun wird die :name Sprache verwendet."
-    note: "AvaIre supportet mehrere von Unterstützern bereitgestellten Sprachen die du mit diesem Befehl auswählen kannst. Die Sprachen könnten unvollständig sein, oder Fehler beinhalten.\nUm eine Sprache auszuwählen, so nutze `{0} <code>`."
+    note: "Xeus supportet mehrere von Unterstützern bereitgestellten Sprachen die du mit diesem Befehl auswählen kannst. Die Sprachen könnten unvollständig sein, oder Fehler beinhalten.\nUm eine Sprache auszuwählen, so nutze `{0} <code>`."
   LevelAlertsCommand:
     message: "`Levels-Up Alerts` wurde für den Server `:status`.:note"
     note: "\nAlle Level-Up Nachrichten werden im <#{0}> protokolliert."
@@ -592,7 +592,7 @@ music:
     playlistIsAlreadyEmpty: 'Die `:playlist` Playlist ist bereits leer. Es befindet sich nicht''s zum Entfernen.'
     songHasBeenRemovedFromPlaylist: ':song wurde erfolgreich von der `:playlist` Playlist entfernt.'
     playlistTitle: ':musical_note: Musik-Playlist {0}'
-    playlistSize: '[ {0} aus {1} ]'
+    playlistSize: '[{0} aus {1} ]'
     playlistLine: "{0}\n       Playlist hat **{1}** Song[s]"
     playlistSongLine: '`{0}` [{1}]({2}) [{3}]'
   RemoveSongFromQueueCommand:
@@ -764,7 +764,7 @@ utility:
       10000: 'Das macht keinen Sinn. :thinking: #BlameAlexis'
       other: 'Einfach nur zu langsam. :dizzy_face:'
   RankBackgroundCommand:
-    canBeUnlocked: "Rank backgrounds can be unlocked using **[Vote Points](https://discordbots.org/bot/avaire)**,\nyou'll get **1 point** each time you vote for the bot."
+    canBeUnlocked: "Rank backgrounds can be unlocked using **[Vote Points](https://discordbots.org/bot/Xeus)**,\nyou'll get **1 point** each time you vote for the bot."
     listTitle: "Rank Backgrounds ({0})"
     youHaveVotePoints: "You have {0} vote points."
     exampleTitle: "{0} Example"
@@ -815,8 +815,8 @@ utility:
     allShards: 'Alle Shards'
     totalShards: 'Insgesamte Shards'
   SourceCommand:
-    noArgs: 'AvaIre Quellcode:'
-    command: 'AvaIre Quellcode für den **:command** Befehl:'
+    noArgs: 'Xeus Quellcode:'
+    command: 'Xeus Quellcode für den **:command** Befehl:'
     invalidCommand: 'Ungültigen Befehl eingegeben. Hier ist der vollstündige Quellcode für den Bot.'
     externalCommand: "Der Befehl wird über ein externes Plugin registriert, der Autor des Plugins hat die Quelle des Befehls nicht öffentlich gemacht, oder sie haben vergessen, einen Link hinzuzufügen, hier ist der vollstündige Quellcode für den Bot."
   StatsCommand:
@@ -866,9 +866,9 @@ utility:
     timeFormat: 'EEEEEEEE, dd. MMMMM yyyy HH:mm'
   VersionCommand:
     current: 'Ich bin derzeit `:difference` :type Versionen dahinter!'
-    getLatest: 'Du kannst die letzte Version vom Bot auf GitHub abfragen. Besuche hierzu [avaire/avaire](https://github.com/avaire/avaire)'
-    usingLatest: "Du nutzt die letzte Version von AvaIre!"
-    latestVersion: 'Die letzte AvaIre-Version ist: v{0}'
+    getLatest: 'Du kannst die letzte Version vom Bot auf GitHub abfragen. Besuche hierzu [Xeus/Xeus](https://github.com/Xeus/Xeus)'
+    usingLatest: "Du nutzt die letzte Version von Xeus!"
+    latestVersion: 'Die letzte Xeus-Version ist: v{0}'
     latestChanges: 'Letzte Änderungen:'
     versions:
       majorName: 'Wichtig'
@@ -882,6 +882,12 @@ utility:
     fields:
       weatherFor: "Wetter für {0}, {1}"
       country: "Land"
-      temperature: "Temperatur"
-      windDirection: "Windrichtung"
-      windSpeed: "Windgeschwindigkeit"
+
+temperature: "Temperatur"
+windDirection: "Windrichtung"
+windSpeed: "Windgeschwindigkeit"
+economy:
+  BaltopCommand:
+    title: "Balance leaderboard for guild {0}"
+    yourRank: "Your rank"
+    line: '`:num` **:username** **:balance**.'
