@@ -24,10 +24,11 @@ package com.pinewoodbuilders.database.transformers;
 import com.google.gson.reflect.TypeToken;
 import com.pinewoodbuilders.Xeus;
 import com.pinewoodbuilders.contracts.database.transformers.Transformer;
+import com.pinewoodbuilders.contracts.roblox.evaluations.EvaluationSettings;
 import com.pinewoodbuilders.database.collection.DataRow;
 import com.pinewoodbuilders.database.controllers.GlobalSettingsController;
-import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -96,9 +97,9 @@ public class GuildSettingsTransformer extends Transformer {
     private long rewardRequestChannelId;
     private boolean isLeadershipServer;
 
-    private JSONObject evaluationSettings = null;
+    private EvaluationSettings evaluationSettings = null;
 
-    public GuildSettingsTransformer(DataRow data) {
+    public GuildSettingsTransformer(DataRow data) throws IOException {
         super(data);
 
         if (hasData()) {
@@ -107,9 +108,8 @@ public class GuildSettingsTransformer extends Transformer {
             robloxGroupId = data.getLong("roblox_group_id");
             groupName = data.getString("group_name");
             mainGroupId = data.getLong("main_group_id");
-            if (mainGroupId != 0) {
-                globalTransformer = GlobalSettingsController.fetchGlobalSettingsFromGroupSettings(Xeus.getInstance(), mainGroupId);
-            }
+            if (mainGroupId != 0) globalTransformer = GlobalSettingsController.fetchGlobalSettingsFromGroupSettings(Xeus.getInstance(), mainGroupId);
+
             mainDiscordRole = data.getLong("main_discord_role");
             minimumHrRank = data.getInt("minimum_hr_rank");
             minimumLeadRank = data.getInt("minimum_lead_rank");   
@@ -155,7 +155,7 @@ public class GuildSettingsTransformer extends Transformer {
             rewardRequestChannelId = data.getLong("reward_request_channel_id");
             isLeadershipServer = data.getBoolean("leadership_server");
 
-            evaluationSettings = new JSONObject(data.getString("evaluation_settings"));
+            evaluationSettings = Xeus.gson.fromJson(data.getString("evaluation_settings"), EvaluationSettings.class);
 
             if (data.getString("moderator_roles", null) != null) {
                 List <String> moderatorRoles = Xeus.gson.fromJson(
@@ -666,11 +666,11 @@ public class GuildSettingsTransformer extends Transformer {
         isLeadershipServer = leadershipServer;
     }
 
-    public JSONObject getEvaluationSettings() {
+    public EvaluationSettings getEvaluationSettings() {
         return evaluationSettings;
     }
 
-    public void setEvaluationSettings(JSONObject evaluationSettings) {
+    public void setEvaluationSettings(EvaluationSettings evaluationSettings) {
         this.evaluationSettings = evaluationSettings;
     }
 }

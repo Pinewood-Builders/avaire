@@ -43,12 +43,12 @@ public class AddEvaluationSettingsToGuildSettingsMigration implements Migration 
 
         if (schema.getDbm().getConnection() instanceof MySQL) {
             schema.getDbm().queryUpdate(String.format(
-                "ALTER TABLE `%s` ADD `evaluation_settings` STRING DEFAULT 0 AFTER `verification_anti_main_global_mod_impersonate`;",
+                "ALTER TABLE `%s` ADD `evaluation_settings` STRING DEFAULT 'base64:eyJldmFscyI6IFtdfQo=' AFTER `verification_anti_main_global_mod_impersonate`;",
                 Constants.GUILD_SETTINGS_TABLE
             ));
         } else {
             schema.getDbm().queryUpdate(String.format(
-                "ALTER TABLE `%s` ADD `evaluation_settings` STRING DEFAULT 0;",
+                "ALTER TABLE `%s` ADD `evaluation_settings` STRING DEFAULT 'base64:eyJldmFscyI6IFtdfQo=';",
                 Constants.GUILD_SETTINGS_TABLE
             ));
         }

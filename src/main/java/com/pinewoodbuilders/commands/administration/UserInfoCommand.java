@@ -179,6 +179,7 @@ public class UserInfoCommand extends Command {
                 if (g == null) continue;
                 if (sb.toString().contains(String.valueOf(data.getInt("roblox_group_id")))) continue;
                 if (data.getBoolean("leadership_server")) {continue;}
+                if (data.getBoolean("official_sub_group")) {continue;}
                 if (data.getString("roblox_group_id") != null) {
                     List<RobloxUserGroupRankService.Data> ranks = avaire.getRobloxAPIManager().getUserAPI().getUserRanks(verifiedRobloxUser.getRobloxId());
                     if (ranks != null) {

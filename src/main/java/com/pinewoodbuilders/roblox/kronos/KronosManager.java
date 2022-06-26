@@ -102,7 +102,7 @@ public class KronosManager {
         return false;
     }
     
-    public Object modifyEvalStatus(Long userId, String division, boolean status) {
+    public void modifyEvalStatus(Long userId, String division, boolean status) {
         Request.Builder request = new Request.Builder()
             .addHeader("User-Agent", "Xeus v" + AppInfo.getAppInfo().version)
             .addHeader("Access-Key", evalApiKey);
@@ -114,22 +114,16 @@ public class KronosManager {
         }
 
         try (Response response = manager.getClient().newCall(request.build()).execute()) {
-            if (response.code() == 200 && response.body() != null) {
-                String body = response.body().string();
-                return new JSONObject(body);
-            } else if (response.code() == 404) {
-                return new JSONObject();
-            } else if (response.code() == 501) {
-                return new JSONObject("[{\"error\": \"Eval status could not be set.\"}]");
-            } else {
+            if (response.code() != 200) {
                 throw new Exception("Kronos API returned something else then 200, please retry.");
+            } else {
+                Xeus.getLogger().info("Successfully modified eval status for user " + userId + " to " + status);
             }
         } catch (IOException e) {
-            Xeus.getLogger().error("Failed sending request to Kronos API: " + e.getMessage());
+            Xeus.getLogger().error("Failed sending request to Kronos Evaluation API: " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
     }
 
 
@@ -162,7 +156,7 @@ public class KronosManager {
                             return null;
                         });
                     } catch (IOException ignored) {
-                        return;
+                        // ignored
                     }
                 });
         }
@@ -200,5 +194,7 @@ public class KronosManager {
             }
         }
     }
+
+
 
 }
