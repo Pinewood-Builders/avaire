@@ -59,6 +59,8 @@ public class Constants {
     public static final String GLOBAL_MUTE_TABLE_NAME = "global_mutes";
     public static final String GLOBAL_WATCH_TABLE_NAME = "global_watch";
     public static final String GLOBAL_SETTINGS_TABLE = "global_settings";
+
+    public static final String GROUP_SETTINGS_TABLE = "group_settings";
     public static final String WARNINGS_TABLE_NAME = "warns";
 
     // Pinewood Specific Tables

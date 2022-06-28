@@ -2,18 +2,12 @@ package com.pinewoodbuilders.contracts.roblox.evaluations.eval;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Eval {
+import java.util.List;
 
-    public Eval(String id, String name, String description, String[] aliases) {
-        this.name = name;
-        this.description = description;
-        this.aliases = aliases;
-    }
-
-    private String id;
+public class Evaluation {private String id;
     private String name;
     private String description;
-    private String[] aliases;
+    private List <String> aliases;
 
     @SerializedName("id")
     public String getID() { return id; }
@@ -31,8 +25,7 @@ public class Eval {
     public void setDescription(String value) { this.description = value; }
 
     @SerializedName("aliases")
-    public String[] getAliases() { return aliases; }
+    public List<String> getAliases() { return aliases; }
     @SerializedName("aliases")
-    public void setAliases(String[] value) { this.aliases = value; }
+    public void setAliases(List<String> value) { this.aliases = value; }
 }
-

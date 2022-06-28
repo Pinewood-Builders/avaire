@@ -24,7 +24,6 @@ package com.pinewoodbuilders.database.transformers;
 import com.google.gson.reflect.TypeToken;
 import com.pinewoodbuilders.Xeus;
 import com.pinewoodbuilders.contracts.database.transformers.Transformer;
-import com.pinewoodbuilders.contracts.roblox.evaluations.EvaluationSettings;
 import com.pinewoodbuilders.database.collection.DataRow;
 import com.pinewoodbuilders.database.controllers.GlobalSettingsController;
 
@@ -97,7 +96,6 @@ public class GuildSettingsTransformer extends Transformer {
     private long rewardRequestChannelId;
     private boolean isLeadershipServer;
 
-    private EvaluationSettings evaluationSettings = null;
 
     public GuildSettingsTransformer(DataRow data) throws IOException {
         super(data);
@@ -154,8 +152,6 @@ public class GuildSettingsTransformer extends Transformer {
 
             rewardRequestChannelId = data.getLong("reward_request_channel_id");
             isLeadershipServer = data.getBoolean("leadership_server");
-
-            evaluationSettings = Xeus.gson.fromJson(data.getString("evaluation_settings"), EvaluationSettings.class);
 
             if (data.getString("moderator_roles", null) != null) {
                 List <String> moderatorRoles = Xeus.gson.fromJson(
@@ -666,11 +662,4 @@ public class GuildSettingsTransformer extends Transformer {
         isLeadershipServer = leadershipServer;
     }
 
-    public EvaluationSettings getEvaluationSettings() {
-        return evaluationSettings;
-    }
-
-    public void setEvaluationSettings(EvaluationSettings evaluationSettings) {
-        this.evaluationSettings = evaluationSettings;
-    }
 }
