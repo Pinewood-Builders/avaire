@@ -26,7 +26,8 @@ import com.google.common.cache.CacheBuilder;
 import com.pinewoodbuilders.Constants;
 import com.pinewoodbuilders.Xeus;
 import com.pinewoodbuilders.database.collection.Collection;
-import com.pinewoodbuilders.database.transformers.GlobalSettingsTransformer;
+import com.pinewoodbuilders.database.transformers.GroupSettingsTransformer;
+import com.pinewoodbuilders.database.transformers.GroupSettingsTransformer;
 import com.pinewoodbuilders.database.transformers.GuildSettingsTransformer;
 import com.pinewoodbuilders.utilities.CacheUtil;
 import org.slf4j.Logger;
@@ -37,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 
 public class GroupSettingsController {
 
-    public static final Cache<Long, GlobalSettingsTransformer> cache = CacheBuilder.newBuilder().recordStats()
+    public static final Cache<Long, GroupSettingsTransformer> cache = CacheBuilder.newBuilder().recordStats()
             .expireAfterAccess(5, TimeUnit.MINUTES).build();
 
     private static final Logger log = LoggerFactory.getLogger(GroupSettingsController.class);
@@ -55,16 +56,16 @@ public class GroupSettingsController {
      *         or null.
      */
     @CheckReturnValue
-    public static GlobalSettingsTransformer fetchGlobalSettingsFromGroupSettings(Xeus avaire, GuildSettingsTransformer transformer) {
+    public static GroupSettingsTransformer fetchGroupSettingsFromGroupSettings(Xeus avaire, GuildSettingsTransformer transformer) {
         if (transformer == null) {return null;}
-        if (transformer.getMainGroupId() == 0) {return null;}
+        if (transformer.getRobloxGroupId() == 0) {return null;}
 
-        return fetchGlobalSettingsFromGroupId(avaire, transformer.getRobloxGroupId());
+        return fetchGroupSettingsFromGroupId(avaire, transformer.getRobloxGroupId());
     }
 
     @CheckReturnValue
-    public static GlobalSettingsTransformer fetchGlobalSettingsFromGroupId(Xeus avaire, long groupId) {
-        return (GlobalSettingsTransformer) CacheUtil.getUncheckedUnwrapped(cache, groupId,
+    public static GroupSettingsTransformer fetchGroupSettingsFromGroupId(Xeus avaire, long groupId) {
+        return (GroupSettingsTransformer) CacheUtil.getUncheckedUnwrapped(cache, groupId,
                 () -> loadGuildSettingsFromDatabase(avaire, groupId));
     }
 
@@ -72,17 +73,17 @@ public class GroupSettingsController {
         cache.invalidate(groupId);
     }
 
-    private static GlobalSettingsTransformer loadGuildSettingsFromDatabase(Xeus avaire, Long groupId) {
+    private static GroupSettingsTransformer loadGuildSettingsFromDatabase(Xeus avaire, Long groupId) {
         if (log.isDebugEnabled()) {
             log.debug("Settings cache for " + groupId + " was refreshed");
         }
         try {
-            Collection query = avaire.getDatabase().newQueryBuilder(Constants.GLOBAL_SETTINGS_TABLE)
+            Collection query = avaire.getDatabase().newQueryBuilder(Constants.GROUP_SETTINGS_TABLE)
                 .select(requiredSettingsColumns)
-                .where("global_settings.main_group_id", groupId)
+                .where("group_settings.group_id", groupId)
                 .get();
 
-            GlobalSettingsTransformer transformer = new GlobalSettingsTransformer(query.first());
+            GroupSettingsTransformer transformer = new GroupSettingsTransformer(query.first());
 
             if (query.size() == 0) {
                 return null;

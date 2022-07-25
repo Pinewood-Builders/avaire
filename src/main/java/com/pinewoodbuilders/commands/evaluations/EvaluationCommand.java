@@ -9,11 +9,16 @@ import com.pinewoodbuilders.contracts.commands.CommandGroup;
 import com.pinewoodbuilders.contracts.commands.CommandGroups;
 import com.pinewoodbuilders.contracts.roblox.evaluations.EvaluationSettings;
 import com.pinewoodbuilders.contracts.roblox.evaluations.EvaluationStatus;
+import com.pinewoodbuilders.contracts.roblox.evaluations.settings.RankSetting;
 import com.pinewoodbuilders.database.collection.Collection;
 import com.pinewoodbuilders.database.collection.DataRow;
+import com.pinewoodbuilders.database.controllers.GroupSettingsController;
+import com.pinewoodbuilders.database.transformers.GroupSettingsTransformer;
 import com.pinewoodbuilders.database.transformers.GuildSettingsTransformer;
 import com.pinewoodbuilders.utilities.NumberUtil;
 import com.pinewoodbuilders.utilities.menu.Paginator;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import okhttp3.Request;
@@ -29,6 +34,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static com.pinewoodbuilders.utilities.JsonReader.readJsonFromUrl;
 
@@ -107,7 +113,7 @@ public class EvaluationCommand extends Command {
         }
 
         return switch (args[0].toLowerCase()) {
-            case "settings" -> runSettings(context, args);
+            case "settings" -> runSettings(context, Arrays.copyOfRange(args, 1, args.length));
             case "set-quiz-channel", "sqc", "quiz-channel", "qc" -> setQuizChannel(context, args);
             case "questions" -> questionSubMenu(context, args);
             case "kronos-sync" -> runKronosSync(context);
@@ -118,15 +124,37 @@ public class EvaluationCommand extends Command {
     }
 
     private boolean runSettings(CommandMessage context, String[] args) {
-        GuildSettingsTransformer guildSettings = context.getGuildSettingsTransformer();
-        if (guildSettings == null) {return sendErrorMessage(context, "The GuildSettingsTransformer is null, please try again later.");}
+        GroupSettingsTransformer guildSettings = GroupSettingsController.fetchGroupSettingsFromGroupSettings(avaire, context.getGuildSettingsTransformer());
+        if (guildSettings == null) {return sendErrorMessage(context, "The GroupSettingsTransformer is null, please try again later.");}
 
         EvaluationSettings evalSettings = guildSettings.getEvaluationSettings();
-        if (args.length < 2) {
+        if (evalSettings == null) {return sendErrorMessage(context, "The EvaluationSettings is null, please try again later.");}
 
+        switch (args[0]) {
+            case "list" -> listEvaluations(context, evalSettings);
         }
 
         return false;
+    }
+
+    private void listEvaluations(CommandMessage context, EvaluationSettings evalSettings) {
+        StringBuilder sb = new StringBuilder();
+        List<MessageEmbed> messageEmbeds = new ArrayList <>();
+        for (RankSetting rankSetting : evalSettings.getRankSettings()) {
+            EmbedBuilder eb = new EmbedBuilder();
+            eb.setDescription("**%s** (`%d`):\n - `ID`: %s\n - `Aliases`: %s\n - `Evaluations`: %s\n\n".formatted(rankSetting.getName(),
+                rankSetting.getOrder(), rankSetting.getId(),
+                Arrays.toString(rankSetting.getAliases()),
+                String.join("", Arrays.stream(rankSetting.getEvaluations())
+                    .map(evaluation -> "\n```  %s (%d):\n   - ID: %s\n   - Aliases: %s```"
+                        .formatted(evaluation.getName(),
+                            evaluation.getOrder(),
+                            evaluation.getId(),
+                            Arrays.toString(evaluation.getAliases()))).toList()
+            )));
+            messageEmbeds.add(eb.build());
+        }
+        context.getTextChannel().sendMessageEmbeds(messageEmbeds).queue();
     }
 
     private boolean ohYes(CommandMessage context) {
@@ -371,11 +399,7 @@ public class EvaluationCommand extends Command {
         GuildSettingsTransformer guildSettings = context.getGuildSettingsTransformer();
         if (guildSettings == null) {return sendErrorMessage(context, "The GuildSettingsTransformer is null, please try again later.");}
 
-        EvaluationSettings evalSettings = guildSettings.getEvaluationSettings();
-        if (evalSettings.getEvals().size() < 1) {
-            context.makeError("The evaluation list is empty or null, please fill the evaluation list for this guild.").queue();
-            return false;
-        }
+
 
         if (args.length < 2) {
             context.makeError("I'm missing an additional argument, do you want to `pass` or `fail` **" + args[0] + "**?").queue();

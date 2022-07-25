@@ -6,10 +6,15 @@ import com.pinewoodbuilders.contracts.roblox.evaluations.settings.RankSetting;
 import java.util.List;
 
 public class EvaluationSettings {
-    private List<RankSetting> rankSettings;
+
+    public EvaluationSettings(RankSetting[] rankSettings) {
+        this.rankSettings = rankSettings;
+    }
+
+    private RankSetting[] rankSettings;
 
     @SerializedName("rankSettings")
-    public List <RankSetting> getRankSettings() { return rankSettings; }
+    public RankSetting[] getRankSettings() { return rankSettings; }
     @SerializedName("rankSettings")
-    public void setRankSettings(List<RankSetting> value) { this.rankSettings = value; }
+    public void setRankSettings(RankSetting[] value) { this.rankSettings = value; }
 }

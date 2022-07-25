@@ -18,7 +18,7 @@ public class CreateEvaluationSettingsTableMigration implements Migration {
         return schema.createIfNotExists(Constants.GROUP_SETTINGS_TABLE, table -> {
             table.Long("group_id");
             table.String("name");
-            table.String("evaluation_settings").defaultValue("base64:eyJldmFscyI6IFtdfQo=");
+            table.String("evaluation_settings").defaultValue("base64:eyJyYW5rU2V0dGluZ3MiOiBbXX0=");
         });
     }    
 

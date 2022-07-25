@@ -33,7 +33,7 @@ public class GroupSettingsTransformer extends Transformer {
     private long groupId = 0;
     private String groupName;
 
-    private final EvaluationSettings evaluationSettings;
+    private EvaluationSettings evaluationSettings = null;
 
     public GroupSettingsTransformer(DataRow data) {
         super(data);
@@ -47,4 +47,27 @@ public class GroupSettingsTransformer extends Transformer {
         }
     }
 
+    public long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(long groupId) {
+        this.groupId = groupId;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public EvaluationSettings getEvaluationSettings() {
+        return evaluationSettings;
+    }
+
+    public void setEvaluationSettings(EvaluationSettings evaluationSettings) {
+        this.evaluationSettings = evaluationSettings;
+    }
 }

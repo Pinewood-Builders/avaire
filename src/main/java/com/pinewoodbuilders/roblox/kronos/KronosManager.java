@@ -176,13 +176,8 @@ public class KronosManager {
         HashMap<Long, List<TrellobanLabels>> root = new HashMap<>();
         if (cache != null) {
             TrellobanService tbs = (TrellobanService) avaire.getRobloxAPIManager().toService(cache, TrellobanService.class);
-            //System.out.println(avaire.getCache().getAdapter(CacheType.FILE).get("trelloban.global"));
-            //System.out.println(tbs.getLoaded());
-
             createTrelloBanList(root, tbs);
-
         } else {
-
             Request.Builder request = new Request.Builder()
                 .addHeader("User-Agent", "Xeus v" + AppInfo.getAppInfo().version)
                 .addHeader("Access-Key", avaire.getConfig().getString("apiKeys.kronosTrellobanKey"))
