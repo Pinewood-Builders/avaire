@@ -234,7 +234,7 @@ public class MessageEventAdapter extends EventAdapter {
 
     private boolean checkLinkFilter(String m) {
         return m.contains("https://") || m.contains("http://") || m.startsWith("porn") || m.contains("www.") || m.contains(".com") || m.contains(".nl") || m.contains(".net") ||
-            m.startsWith("http") || m.startsWith("https") || m.contains("http//") || m.contains("https//") || m.matches("[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)") || m.contains("%E2");
+            m.startsWith("http") || m.startsWith("https") || m.contains("http//") || m.contains("https//") || m.matches("[-a-zA-Z\\d@:%._+~#=]{1,256}\\.[a-zA-Z\\d()]{1,6}\\b([-a-zA-Z\\d()@:%_+.~#?&/=]*)") || m.contains("%E2");
     }
 
     public void onGuildMessageUpdate(MessageUpdateEvent event) {
@@ -1035,7 +1035,21 @@ public class MessageEventAdapter extends EventAdapter {
                                     }
 
                                     try {
-                                        avaire.getGlobalPunishmentManager().registerGlobalBan(moderatorEntity.getDiscordId().toString(), gst.getMainGroupId(), bannedEntity != null ? bannedEntity.getDiscordId().toString() : null, finalBannedRobloxId, finalUsernameFinal, finalReason);
+                                        avaire.getGlobalPunishmentManager().registerGlobalBan(String.valueOf(moderatorEntity.getDiscordId()), gst.getMainGroupId(), bannedEntity != null && bannedEntity.getRobloxId() != 0 ? String.valueOf(bannedEntity.getDiscordId()) : null, finalBannedRobloxId, finalUsernameFinal, finalReason);
+                                        if (bannedEntity != null) {
+                                            List <Guild> guilds = avaire.getRobloxAPIManager().getVerification().getGuildsByMainGroupId(gst.getMainGroupId(), false);
+                                            for (Guild g : guilds) {
+                                                if (g.getIdLong() == gst.getGlobalSettings().getModerationServerId())
+                                                    continue;
+
+                                                if (g.getIdLong() == gst.getGlobalSettings().getAppealsDiscordId())
+                                                    continue;
+
+                                                if (!g.getSelfMember().hasPermission(Permission.BAN_MEMBERS)) continue;
+
+                                                g.ban(UserSnowflake.fromId(bannedEntity.getDiscordId()), 0).reason(finalReason).queue();
+                                            }
+                                        }
                                     } catch (SQLException ex) {
                                         e.reply("Hi, something went wrong in the ban system.\n" +
                                             "Please contact stefano... PLEASE. CONTACT HIM... NOWWWWW!!!!!?!?!?!?").queue();
@@ -1043,7 +1057,7 @@ public class MessageEventAdapter extends EventAdapter {
                                     }
                                     message1.delete().queue();
                                     e.reply("<@" + moderatorEntity.getDiscordId() + ">\n" +
-                                        "You just global-banned " + finalUsernameFinal + " for: ```" + finalReason + "```.").queue(del -> del.deleteOriginal().queueAfter(15, TimeUnit.SECONDS));
+                                        "You just global-banned " + finalUsernameFinal + " for: ```" + finalReason + "```").queue(del -> del.deleteOriginal().queueAfter(15, TimeUnit.SECONDS));
 
                                     if (bannedEntity == null) {
                                         msg.addReaction("☑").queue();
@@ -1065,74 +1079,6 @@ public class MessageEventAdapter extends EventAdapter {
             return;
         }
 
-    }
-
-
-    private void executeGlobalBan(String reason, String bannedUserId, GuildSettingsTransformer settingsTransformer, VerificationEntity ve, VerificationEntity moderator, Guild moderatorDiscord) {
-        Guild appealsGuild = null;
-        if (settingsTransformer.getGlobalSettings().getAppealsDiscordId() != 0) {
-            appealsGuild = avaire.getShardManager().getGuildById(settingsTransformer.getGlobalSettings().getAppealsDiscordId());
-        }
-
-        int time = 0;
-        List <Guild> guilds = avaire.getRobloxAPIManager().getVerification().getGuildsByMainGroupId(settingsTransformer.getMainGroupId());
-
-        for (Guild guild : guilds) {
-            if (appealsGuild != null) {
-                if (appealsGuild.getId().equals(guild.getId())) {
-                    continue;
-                }
-            }
-            if (guild == null)
-                continue;
-            if (!guild.getSelfMember().hasPermission(Permission.BAN_MEMBERS))
-                continue;
-
-            GuildSettingsTransformer settings = GuildSettingsController.fetchGuildSettingsFromGuild(avaire, guild);
-            if (settings.getGlobalBan()) continue;
-            if (settings.isOfficialSubGroup()) {
-                guild.ban(UserSnowflake.fromId(bannedUserId), time, "Banned by: " + moderator.getRobloxUsername() + "\n" + "For: "
-                        + reason
-                        + "\n*THIS IS A MGM GLOBAL BAN, DO NOT REVOKE THIS BAN WITHOUT CONSULTING THE MGM MODERATOR WHO INITIATED THE GLOBAL BAN, REVOKING THIS BAN WITHOUT MGM APPROVAL WILL RESULT IN DISCIPlINARY ACTION!*")
-                    .reason("Global Ban, executed by " + moderator.getRobloxUsername() + ". For: \n"
-                        + reason)
-                    .queue();
-            } else {
-                guild.ban(UserSnowflake.fromId(bannedUserId), time,
-                        "This is a global-ban that has been executed from the global ban list of the guild you're subscribed to... ")
-                    .queue();
-            }
-        }
-
-        User u = avaire.getShardManager().getUserById(bannedUserId);
-        if (u != null) {
-            u.openPrivateChannel().submit().thenAccept(p -> p.sendMessageEmbeds(MessageFactory.createEmbeddedBuilder().setDescription(
-                    "*You have been **global-banned** from all discord that are connected to [this group](:groupLink) by an MGM Moderator. "
-                        + "For the reason: *```" + reason + "```\n\n"
-                        + "If you feel that your ban was unjustified please appeal at the group in question;"
-
-                        + "Ask an admin of [this group](" + "https://roblox.com/groups/"
-                        + settingsTransformer.getGlobalSettings().getMainGroupId() + "), to create an invite on the appeals discord server of the group.")
-                .setColor(Color.BLACK).build()).submit()).whenComplete((message, error) -> {
-                if (error != null) {
-                    error.printStackTrace();
-                }
-            });
-        }
-
-
-        long mgmLogs = settingsTransformer.getGlobalSettings().getMgmLogsId();
-        if (mgmLogs != 0) {
-            TextChannel tc = avaire.getShardManager().getTextChannelById(mgmLogs);
-            if (tc != null) {
-                tc.sendMessageEmbeds(new PlaceholderMessage(new EmbedBuilder(), "`:global-unbanned-id` was global-banned from all discords that have global-ban enabled during verification. Banned by ***:user*** in `:guild` for:\n"
-                    + "```:reason```")
-                    .set("global-unbanned-id", bannedUserId)
-                    .set("reason", reason)
-                    .set("guild", moderatorDiscord.getName())
-                    .set("user", "<@" + moderator.getDiscordId() + ">").buildEmbed()).queue();
-            }
-        }
     }
 }
 
