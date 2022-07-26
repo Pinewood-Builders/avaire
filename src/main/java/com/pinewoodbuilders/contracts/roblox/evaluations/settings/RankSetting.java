@@ -6,7 +6,7 @@ import com.pinewoodbuilders.contracts.roblox.evaluations.eval.Evaluation;
 import java.util.List;
 
 public class RankSetting {
-    public RankSetting(long order, String id, String name, String[] aliases, String description, Evaluation[] evaluations) {
+    public RankSetting(long order, String id, String name, List<String> aliases, String description, List<Evaluation> evaluations) {
         this.order = order;
         this.id = id;
         this.name = name;
@@ -15,12 +15,16 @@ public class RankSetting {
         this.evaluations = evaluations;
     }
 
+    public RankSetting() {}
+
+
+
     private long order;
     private String id;
     private String name;
-    private String[] aliases;
+    private List<String> aliases;
     private String description;
-    private Evaluation[] evaluations;
+    private List<Evaluation> evaluations;
 
     @SerializedName("order")
     public long getOrder() { return order; }
@@ -43,9 +47,9 @@ public class RankSetting {
     }
 
     @SerializedName("aliases")
-    public String[] getAliases() { return aliases; }
+    public List<String> getAliases() { return aliases; }
     @SerializedName("aliases")
-    public void setAliases(String[] value) { this.aliases = value; }
+    public void setAliases(List<String> value) { this.aliases = value; }
 
     @SerializedName("description")
     public String getDescription() { return description; }
@@ -53,8 +57,8 @@ public class RankSetting {
     public void setDescription(String value) { this.description = value; }
 
     @SerializedName("evaluations")
-    public Evaluation[] getEvaluations() { return evaluations; }
+    public List<Evaluation> getEvaluations() { return evaluations; }
     @SerializedName("evaluations")
-    public void setEvaluations(Evaluation[] value) { this.evaluations = value; }
+    public void setEvaluations(List<Evaluation> value) { this.evaluations = value; }
 }
 

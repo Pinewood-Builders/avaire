@@ -10,6 +10,7 @@ import com.pinewoodbuilders.contracts.commands.CommandGroups;
 import com.pinewoodbuilders.contracts.roblox.evaluations.EvaluationSettings;
 import com.pinewoodbuilders.contracts.roblox.evaluations.EvaluationStatus;
 import com.pinewoodbuilders.contracts.roblox.evaluations.settings.RankSetting;
+import com.pinewoodbuilders.contracts.roblox.evaluations.settings.RankSettingBuilder;
 import com.pinewoodbuilders.database.collection.Collection;
 import com.pinewoodbuilders.database.collection.DataRow;
 import com.pinewoodbuilders.database.controllers.GroupSettingsController;
@@ -34,7 +35,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static com.pinewoodbuilders.utilities.JsonReader.readJsonFromUrl;
 
@@ -132,26 +132,54 @@ public class EvaluationCommand extends Command {
 
         switch (args[0]) {
             case "list" -> listEvaluations(context, evalSettings);
+            case "modify" -> modifyEvaluations(context, evalSettings, Arrays.copyOfRange(args, 1, args.length));
         }
 
         return false;
     }
 
+    private void modifyEvaluations(CommandMessage context, EvaluationSettings evalSettings, String[] args) {
+        if (args.length < 1) {
+            context.makeError("Invalid usage of command. Please add the required arguments. (Begin with the roblox " +
+                "name)").queue();
+            return;
+        }
+
+        switch (args[1]) {
+            case "add" -> addEvaluation(context, evalSettings, Arrays.copyOfRange(args, 1, args.length));
+            case "remove" -> removeEvaluation(context, evalSettings, Arrays.copyOfRange(args, 1, args.length));
+            case "clear" -> clearEvaluation(context, evalSettings, Arrays.copyOfRange(args, 1, args.length));
+        }
+    }
+
+    private void clearEvaluation(CommandMessage context, EvaluationSettings evalSettings, String[] args) {
+    }
+
+    private void removeEvaluation(CommandMessage context, EvaluationSettings evalSettings, String[] args) {
+
+    }
+
+    //!evals settings add <type> <id> <aliases> <eval> <user>
+    private void addEvaluation(CommandMessage context, EvaluationSettings evalSettings, String[] args) {
+        RankSettingBuilder rs = new RankSettingBuilder();
+        rs.addAlias("owo");
+    }
+
     private void listEvaluations(CommandMessage context, EvaluationSettings evalSettings) {
-        StringBuilder sb = new StringBuilder();
         List<MessageEmbed> messageEmbeds = new ArrayList <>();
         for (RankSetting rankSetting : evalSettings.getRankSettings()) {
             EmbedBuilder eb = new EmbedBuilder();
             eb.setDescription("**%s** (`%d`):\n - `ID`: %s\n - `Aliases`: %s\n - `Evaluations`: %s\n\n".formatted(rankSetting.getName(),
                 rankSetting.getOrder(), rankSetting.getId(),
-                Arrays.toString(rankSetting.getAliases()),
-                String.join("", Arrays.stream(rankSetting.getEvaluations())
+                rankSetting.getAliases().toString(),
+                String.join("", rankSetting.getEvaluations().stream()
                     .map(evaluation -> "\n```  %s (%d):\n   - ID: %s\n   - Aliases: %s```"
                         .formatted(evaluation.getName(),
                             evaluation.getOrder(),
                             evaluation.getId(),
                             Arrays.toString(evaluation.getAliases()))).toList()
-            )));
+            ))).setFooter(rankSetting.getId() + " | " + rankSetting.getName() + " | " + rankSetting.getOrder());
+
             messageEmbeds.add(eb.build());
         }
         context.getTextChannel().sendMessageEmbeds(messageEmbeds).queue();
