@@ -762,7 +762,7 @@ public class GlobalModCommand extends Command {
             context.makeError("Somehow, this ID doesn't exist in the database. Please ban this user's roblox account instead.");
             return false;
         }
-        boolean isGBanned = avaire.getGlobalPunishmentManager().isRobloxGlobalBanned(context.getGuildSettingsTransformer().getMainGroupId(), verificationEntity.getRobloxId());
+        boolean isGBanned = avaire.getGlobalPunishmentManager().isGlobalBanned(context.getGuildSettingsTransformer().getMainGroupId(), String.valueOf(verificationEntity.getDiscordId()));
         if (isGBanned || forced) {
             List <Guild> guilds = avaire.getRobloxAPIManager().getVerification().getGuildsByMainGroupId(context.getGuildSettingsTransformer().getMainGroupId(), globalBan);
             StringBuilder sb = new StringBuilder();
@@ -785,7 +785,7 @@ public class GlobalModCommand extends Command {
                 });
 
             }
-            avaire.getGlobalPunishmentManager().unregisterRobloxGlobalBan(context.getGuildSettingsTransformer().getMainGroupId(), verificationEntity.getRobloxId());
+            avaire.getGlobalPunishmentManager().unregisterDiscordGlobalBan(context.getGuildSettingsTransformer().getMainGroupId(), String.valueOf(verificationEntity.getDiscordId()));
 
             TextChannel tc = avaire.getShardManager().getTextChannelById(context.getGuildSettingsTransformer().getGlobalSettings().getMainGroupId());
             if (tc != null) {
@@ -1022,16 +1022,9 @@ public class GlobalModCommand extends Command {
             if (username != null) {
                 Collection c = avaire.getDatabase().newQueryBuilder(Constants.ANTI_UNBAN_TABLE_NAME)
                     .where("roblox_user_id", userId).get();
-                /*avaire.getDatabase().newQueryBuilder(Constants.ANTI_UNBAN_TABLE_NAME).insert(o -> {
-                    o.set("punisherId", context.getAuthor().getId()).set("reason", reason, true)
-                        .set("roblox_username", username)
-                        .set("main_group_id", context.getGuildSettingsTransformer().getMainGroupId())
-                        .set("roblox_user_id", userId);
-                });*/
 
                 avaire.getGlobalPunishmentManager().registerGlobalBan(context.getAuthor().getId(),
-                    context.getGuildSettingsTransformer().getMainGroupId(),
-                    null, userId, username, reason);
+                    context.getGuildSettingsTransformer().getMainGroupId(), null, userId, username, reason);
 
                 if (c.size() < 1) {
                     context.makeSuccess("Permbanned ``" + args[1] + "`` in the database.").queue();

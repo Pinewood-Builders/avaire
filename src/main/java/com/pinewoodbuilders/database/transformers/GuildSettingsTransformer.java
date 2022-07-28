@@ -27,6 +27,7 @@ import com.pinewoodbuilders.contracts.database.transformers.Transformer;
 import com.pinewoodbuilders.database.collection.DataRow;
 import com.pinewoodbuilders.database.controllers.GlobalSettingsController;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -95,7 +96,8 @@ public class GuildSettingsTransformer extends Transformer {
     private long rewardRequestChannelId;
     private boolean isLeadershipServer;
 
-    public GuildSettingsTransformer(DataRow data) {
+
+    public GuildSettingsTransformer(DataRow data) throws IOException {
         super(data);
 
         if (hasData()) {
@@ -104,9 +106,8 @@ public class GuildSettingsTransformer extends Transformer {
             robloxGroupId = data.getLong("roblox_group_id");
             groupName = data.getString("group_name");
             mainGroupId = data.getLong("main_group_id");
-            if (mainGroupId != 0) {
-                globalTransformer = GlobalSettingsController.fetchGlobalSettingsFromGroupSettings(Xeus.getInstance(), mainGroupId);
-            }
+            if (mainGroupId != 0) globalTransformer = GlobalSettingsController.fetchGlobalSettingsFromGroupSettings(Xeus.getInstance(), mainGroupId);
+
             mainDiscordRole = data.getLong("main_discord_role");
             minimumHrRank = data.getInt("minimum_hr_rank");
             minimumLeadRank = data.getInt("minimum_lead_rank");   
@@ -660,4 +661,5 @@ public class GuildSettingsTransformer extends Transformer {
     public void setLeadershipServer(boolean leadershipServer) {
         isLeadershipServer = leadershipServer;
     }
+
 }

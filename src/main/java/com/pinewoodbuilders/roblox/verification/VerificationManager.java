@@ -125,7 +125,7 @@ public class VerificationManager {
         VerificationTransformer verificationTransformer = VerificationController.fetchVerificationFromGuild(avaire, guild);
         if (transformer.getPbVerificationTrelloban()) {
             HashMap<Long, List<TrellobanLabels>> trellobans = avaire.getRobloxAPIManager().getKronosManager().getTrelloBans();
-            if (trellobans != null && isTrelloBanned(trellobans, member)) {
+            if (trellobans != null && isTrelloBanned(trellobans, verificationEntity)) {
                 boolean isAppealsVerification = checkTrelloBan(transformer, member, guild, verificationEntity);
                 if (isAppealsVerification) {
                     return verifyRoles(member, guild, verificationEntity, verificationTransformer);
@@ -137,14 +137,14 @@ public class VerificationManager {
             return new VerificationResult(false, "Blacklisted on " + guild.getName());
         }
 
-        boolean isGlobalBanned = avaire.getGlobalPunishmentManager().isRobloxGlobalBanned(transformer.getMainGroupId(), verificationEntity.getRobloxId());
+        boolean isGlobalBanned = avaire.getGlobalPunishmentManager().isGlobalBanned(transformer.getMainGroupId(), String.valueOf(verificationEntity.getDiscordId()));
 
         if (isGlobalBanned) {
             List<GlobalBanContainer> globalBanContainer = avaire.getGlobalPunishmentManager()
                 .getGlobalBans()
                 .get(transformer.getMainGroupId())
                 .stream()
-                .filter(user -> user.getRobloxId() == verificationEntity.getRobloxId()).toList();
+                .filter(user -> Objects.equals(user.getUserId(), String.valueOf(verificationEntity.getDiscordId()))).toList();
             if (globalBanContainer.size() > 0) {
                 return canGlobalBan(globalBanContainer.get(0), transformer, member, verificationEntity);
             }
@@ -180,8 +180,13 @@ public class VerificationManager {
 
             Map<GuildRobloxRanksService.GroupRankBinding, Role> bindingRoleMap = guildRanks.getGroupRankBindings()
                 .stream()
+                .filter(binding -> {
+                    Role r = guild.getRoleById(binding.getRole());
+                    return r != null;
+                })
                 .collect(Collectors.toMap(Function.identity(),
-                    groupRankBinding -> guild.getRoleById(groupRankBinding.getRole()))),
+                    groupRankBinding -> {
+                    return guild.getRoleById(groupRankBinding.getRole());})),
                 bindingRoleAddMap = new HashMap<>();
 
             // Loop through all the group-rank bindings
@@ -262,8 +267,8 @@ public class VerificationManager {
         }
     }
 
-    private boolean isTrelloBanned(HashMap<Long, List<TrellobanLabels>> trellobans, Member member) {
-        return trellobans.containsKey(member.getIdLong());
+    private boolean isTrelloBanned(HashMap<Long, List<TrellobanLabels>> trellobans, VerificationEntity member) {
+        return trellobans.containsKey(member.getRobloxId());
     }
 
 
@@ -462,6 +467,7 @@ public class VerificationManager {
                     .queue();
             }
         }
+        member.ban(0, "Trelloban").queue();
         return false;
     }
 
@@ -498,10 +504,10 @@ public class VerificationManager {
             GuildSettingsTransformer settings = GuildSettingsController.fetchGuildSettingsFromGuild(avaire, guild);
             if (settings.getGlobalBan()) continue;
             if (settings.isOfficialSubGroup()) {
-                guild.ban(m, time, "Banned by: " + m.getEffectiveName() + "\n" + "For: "
+                guild.ban(m, time, "Banned by: " + guild.getSelfMember().getEffectiveName() + "\n" + "For: "
                         + reason
                         + "\n*THIS IS A MGM GLOBAL BAN, DO NOT REVOKE THIS BAN WITHOUT CONSULTING THE MGM MODERATOR WHO INITIATED THE GLOBAL BAN, REVOKING THIS BAN WITHOUT MGM APPROVAL WILL RESULT IN DISCIPlINARY ACTION!*")
-                    .reason("Global Ban, executed by " + m.getEffectiveName() + ". For: \n"
+                    .reason("Global Ban, executed by " + guild.getSelfMember().getEffectiveName() + ". For: \n"
                         + reason)
                     .queue();
             } else {
@@ -633,6 +639,10 @@ public class VerificationManager {
             entity = callUserFromBloxlinkAPI(discordUserId);
         }
 
+        if (entity == null) {
+            entity = callUserFromRoWifiAPI(discordUserId);
+        }
+
         return entity;
     }
 
@@ -720,14 +730,11 @@ public class VerificationManager {
         if (cache.getIfPresent(discordUserId) != null) {
             cache.invalidate(discordUserId);
         }
-        switch (discordUserId.split(":")[0]) {
-            case "rover":
-                return callUserFromRoverAPI(discordUserId.split(":")[1]);
-            case "bloxlink":
-                return callUserFromBloxlinkAPI(discordUserId.split(":")[1]);
-            default:
-                return callUserFromDatabaseAPI(discordUserId.split(":")[1]);
-        }
+        return switch (discordUserId.split(":")[0]) {
+            case "rover" -> callUserFromRoverAPI(discordUserId.split(":")[1]);
+            case "bloxlink" -> callUserFromBloxlinkAPI(discordUserId.split(":")[1]);
+            default -> callUserFromDatabaseAPI(discordUserId.split(":")[1]);
+        };
     }
 
     public VerificationEntity callUserFromDatabaseAPI(String discordUserId) {

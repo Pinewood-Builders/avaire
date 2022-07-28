@@ -8,6 +8,7 @@ import com.pinewoodbuilders.contracts.verification.VerificationEntity;
 import com.pinewoodbuilders.database.collection.Collection;
 import com.pinewoodbuilders.database.query.QueryBuilder;
 import com.pinewoodbuilders.database.transformers.GuildSettingsTransformer;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -70,6 +71,18 @@ public class XeusPermissionUtil {
                         return GuildPermissionCheckType.GROUP_SHOUT;
                     }
                 }
+            }
+        }
+
+        if (guildTransformer.getLeadRoles() == null &&
+            guildTransformer.getGroupShoutRoles() == null &&
+            guildTransformer.getHRRoles() == null) {
+            if (member.hasPermission(Permission.ADMINISTRATOR)) {
+                return GuildPermissionCheckType.LOCAL_GROUP_LEADERSHIP;
+            }
+
+            if (member.hasPermission(Permission.BAN_MEMBERS) || member.hasPermission(Permission.KICK_MEMBERS)) {
+                return GuildPermissionCheckType.LOCAL_GROUP_LEADERSHIP;
             }
         }
 

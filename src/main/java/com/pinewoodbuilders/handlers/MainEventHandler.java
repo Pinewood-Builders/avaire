@@ -33,6 +33,7 @@ import com.pinewoodbuilders.pinewood.adapter.WhitelistEventAdapter;
 import com.pinewoodbuilders.utilities.CacheUtil;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.ReconnectedEvent;
@@ -42,7 +43,7 @@ import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.channel.update.ChannelUpdateNameEvent;
 import net.dv8tion.jda.api.events.channel.update.ChannelUpdatePositionEvent;
 import net.dv8tion.jda.api.events.channel.update.ChannelUpdateRegionEvent;
-import net.dv8tion.jda.api.events.emote.EmoteRemovedEvent;
+import net.dv8tion.jda.api.events.emoji.EmojiRemovedEvent;
 import net.dv8tion.jda.api.events.guild.*;
 import net.dv8tion.jda.api.events.guild.invite.GuildInviteCreateEvent;
 import net.dv8tion.jda.api.events.guild.invite.GuildInviteDeleteEvent;
@@ -51,11 +52,12 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateNameEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.events.message.*;
-import net.dv8tion.jda.api.events.message.react.GenericMessageReactionEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.events.role.GenericRoleEvent;
@@ -92,6 +94,8 @@ public class MainEventHandler extends EventHandler {
     private final WhitelistEventAdapter whitelistEventAdapter;
     private final ButtonClickEventAdapter buttonClickEventAdapter;
     private final SlashCommandEventAdapter slashCommandEventAdapter;
+    private final AppealsServerEventAdapter appealsServerEventAdapter;
+
     public static final Cache<Long, Boolean> cache = CacheBuilder.newBuilder()
         .recordStats()
         .expireAfterWrite(15, TimeUnit.MINUTES)
@@ -121,6 +125,7 @@ public class MainEventHandler extends EventHandler {
         this.whitelistEventAdapter = new WhitelistEventAdapter(avaire, avaire.getVoiceWhitelistManager());
         this.buttonClickEventAdapter = new ButtonClickEventAdapter(avaire);
         this.slashCommandEventAdapter = new SlashCommandEventAdapter(avaire);
+        this.appealsServerEventAdapter = new AppealsServerEventAdapter(avaire);
     }
 
     @Override
@@ -224,76 +229,6 @@ public class MainEventHandler extends EventHandler {
     @Override
     public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
         memberEvent.onGuildMemberJoin(event);
-        if (event.getGuild().getId().equals("438134543837560832")) {
-            checkInviteAndRole(event);
-        }
-
-    }
-
-
-    // keep in mind that invite events will only fire for channels which your bot has MANAGE_CHANNEL perm in
-    @Override
-    public void onGuildInviteCreate(final GuildInviteCreateEvent event)                               // gets fired when an invite is created, lets cache it
-    {
-        event.getGuild().retrieveInvites().queue(l -> {
-            invites = l.size();
-        });                                                          // put code as a key and InviteData object as a value into the map; cache
-    }
-
-    // keep in mind that invite events will only fire for channels which your bot has MANAGE_CHANNEL perm in
-    @Override
-    public void onGuildInviteDelete(final GuildInviteDeleteEvent event)                               // gets fired when an invite is created, lets cache it
-    {
-        event.getGuild().retrieveInvites().queue(l -> {
-            invites = l.size();
-        });                                                          // put code as a key and InviteData object as a value into the map; cache
-    }
-
-    public void checkInviteAndRole(final GuildMemberJoinEvent event)                                   // gets fired when a member has joined, lets try to get the invite the member used
-    {
-        final Guild guild = event.getGuild();                                                         // get the guild a member joined to
-        if (!guild.getId().equals("438134543837560832")) return;
-
-        final User user = event.getUser();                                                            // get the user who joined
-        final Member selfMember = guild.getSelfMember();                                              // get your bot's member object for this guild
-
-        if (!selfMember.hasPermission(Permission.MANAGE_SERVER) || user.isBot())                      // check if your bot doesn't have MANAGE_SERVER permission and the user who joined is a bot, if either of those is true, return
-            return;
-
-        guild.retrieveInvites().queue(retrievedInvites ->                                             // retrieve all guild's invites
-        {
-            if (retrievedInvites.size() == invites) return;
-            if (retrievedInvites.size() > invites) return;
-            List<Role> roles = event.getGuild().getRolesByName("Pizza Delivery", true);
-            if (roles.size() == 0) {
-                System.out.println("Role does not exist");
-                return;
-            }
-            Role r = roles.get(0);
-            event.getGuild().addRoleToMember(event.getMember(), r).queue();
-            invites = retrievedInvites.size();
-        });
-    }
-
-    @Override
-    public void onGuildReady(final GuildReadyEvent event)                                             // gets fired when a guild has finished setting up upon booting the bot, lets try to cache its invites
-    {
-        final Guild guild = event.getGuild();
-        attemptInviteCaching(guild);                                                                  // attempt to store guild's invites
-    }
-
-    private void attemptInviteCaching(final Guild guild)                                              // helper method to prevent duplicate code for GuildReadyEvent and GuildJoinEvent
-    {
-        if (!guild.getId().equals("438134543837560832")) return;// get the guild that has finished setting up
-        final Member selfMember = guild.getSelfMember();                                              // get your bot's member object for this guild
-
-        if (!selfMember.hasPermission(Permission.MANAGE_SERVER))                                      // check if your bot doesn't have MANAGE_SERVER permission to retrieve the invites, if true, return
-            return;
-
-        guild.retrieveInvites().queue(retrievedInvites ->                                             // retrieve all guild's invites
-        {
-            invites = retrievedInvites.size();
-        });
     }
 
     @Override
@@ -430,7 +365,7 @@ public class MainEventHandler extends EventHandler {
     }
 
     @Override
-    public void onEmoteRemoved(EmoteRemovedEvent event) {
+    public void onEmojiRemoved(@NotNull EmojiRemovedEvent event) {
         reactionEmoteEventAdapter.onEmoteRemoved(event);
     }
 
@@ -456,6 +391,18 @@ public class MainEventHandler extends EventHandler {
         buttonClickEventAdapter.onReportsButtonInteractionEvent(event);
         buttonClickEventAdapter.onFeedbackButtonInteractionEvent(event);
         buttonClickEventAdapter.onQuizButtonInteractionEvent(event);
+
+        appealsServerEventAdapter.onAppealsButtonClickEvent(event);
+    }
+
+    @Override
+    public void onSelectMenuInteraction(@Nonnull SelectMenuInteractionEvent event) {
+        appealsServerEventAdapter.onAppealsSelectMenuInteractionEvent(event);
+    }
+
+    @Override
+    public void onModalInteraction(@Nonnull ModalInteractionEvent event) {
+        appealsServerEventAdapter.onAppealModelInteractionEvent(event);
     }
 
     @Override
@@ -465,14 +412,7 @@ public class MainEventHandler extends EventHandler {
         }
     }
 
-    private boolean isValidMessageReactionEvent(GenericMessageReactionEvent event) {
-        return event.isFromGuild() && event.getReactionEmote().isEmote();
-    }
 
-/*    private boolean isValidReportChannel(MessageReactionAddEvent event) {
-        return event.getChannel().getId().equals(Constants.PBST_REPORT_CHANNEL) || event.getChannel().getId().equals(Constants.PET_REPORT_CHANNEL)
-                || event.getChannel().getId().equals(Constants.TMS_REPORT_CHANNEL) || event.getChannel().getId().equals(Constants.PB_REPORT_CHANNEL) || event.getChannel().getName().equals("handbook-violator-reports");
-    }*/
 
     private void prepareGuildMembers(GenericEvent event) {
         if (event instanceof GenericMessageEvent genericMessageEvent) {
@@ -537,13 +477,13 @@ public class MainEventHandler extends EventHandler {
 
     private boolean isValidMessageReactionEvent(MessageReactionAddEvent event) {
         return event.isFromGuild()
-            && (event.getReactionEmote().isEmoji() || event.getReactionEmote().isEmote())
+            && (event.getEmoji().getType().equals(Emoji.Type.UNICODE) || event.getEmoji().getType().equals(Emoji.Type.CUSTOM))
             && !event.getMember().getUser().isBot();
     }
 
     private boolean isValidMessageReactionEvent(MessageReactionRemoveEvent event) {
         return event.isFromGuild()
-            && event.getReactionEmote().isEmote();
+            && event.getEmoji().getType().equals(Emoji.Type.CUSTOM);
     }
 
 }

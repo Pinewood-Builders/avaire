@@ -14,10 +14,11 @@ import com.pinewoodbuilders.database.transformers.GuildSettingsTransformer;
 import com.pinewoodbuilders.utilities.MentionableUtil;
 import com.pinewoodbuilders.utilities.XeusPermissionUtil;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import org.json.JSONObject;
 
 import javax.annotation.Nonnull;
 import java.sql.SQLException;
@@ -25,8 +26,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static com.pinewoodbuilders.utilities.JsonReader.readJsonFromUrl;
 
 public class RequestRewardCommand extends Command {
 
@@ -129,7 +128,7 @@ public class RequestRewardCommand extends Command {
                 qb.get().forEach(dataRow -> {
                     if (dataRow.getString("request_reward_channel_id") != null) {
                         Guild g = avaire.getShardManager().getGuildById(dataRow.getString("id"));
-                        Emote e = avaire.getShardManager().getEmoteById(dataRow.getString("emoji_id"));
+                        RichCustomEmoji e = avaire.getShardManager().getEmojiById(dataRow.getString("emoji_id"));
 
                         if (g != null && e != null) {
                             sb.append("``").append(g.getName()).append("`` - ").append(e.getAsMention()).append("\n");
@@ -140,7 +139,7 @@ public class RequestRewardCommand extends Command {
                     }
 
                 });
-                l.addReaction("❌").queue();
+                l.addReaction(Emoji.fromFormatted("❌")).queue();
                 l.editMessageEmbeds(context.makeInfo("Welcome to the recorded reward request system. Please select the group you wanna reward someone in!\n\n" + sb.toString()).buildEmbed()).queue(
                     message -> {
                         avaire.getWaiter().waitForEvent(MessageReactionAddEvent.class, event -> {
@@ -249,22 +248,5 @@ public class RequestRewardCommand extends Command {
 
     }
 
-    public static void createReactions(Message r) {
-        r.addReaction("\uD83D\uDC4D").queue();   // 👍
-        r.addReaction("\uD83D\uDC4E").queue();  // 👎
-        r.addReaction("✅").queue();
-        r.addReaction("❌").queue();
-        r.addReaction("🚫").queue();
-        r.addReaction("\uD83D\uDD04").queue(); // 🔄
-    }
-
-    private static Long getRobloxId(String un) {
-        try {
-            JSONObject json = readJsonFromUrl("https://api.roblox.com/users/get-by-username?username=" + un);
-            return Double.valueOf(json.getDouble("Id")).longValue();
-        } catch (Exception e) {
-            return 0L;
-        }
-    }
 
 }
