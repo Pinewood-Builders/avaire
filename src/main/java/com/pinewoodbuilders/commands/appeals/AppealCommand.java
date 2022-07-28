@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.entities.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -46,7 +45,7 @@ public class AppealCommand extends Command {
 
     @Override
     public List <String> getTriggers() {
-        return Arrays.asList("appeal", "appeal-management");
+        return Arrays.asList("deletion");
     }
 
     @Override
@@ -113,7 +112,7 @@ public class AppealCommand extends Command {
                 .setTitle("Pinewood - Appeal System").buildEmbed())
             .delay(40, TimeUnit.SECONDS)
             .queue(closedMessage -> {
-                String topic = closedMessage.getTextChannel().getTopic();
+                String topic = closedMessage.getChannel().asTextChannel().getTopic();
 
                 if (topic != null && topic.contains("DELETING")) {
 

@@ -21,11 +21,11 @@ import com.pinewoodbuilders.utilities.menu.Paginator;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -35,8 +35,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static com.pinewoodbuilders.utilities.JsonReader.readJsonFromUrl;
 
 public class EvaluationCommand extends Command {
     private final Paginator.Builder builder;
@@ -215,9 +213,9 @@ public class EvaluationCommand extends Command {
                             .set("status", "Passed").queue(
                                 message -> {
                                     message.createThreadChannel(username).queue();
-                                    message.addReaction("\uD83D\uDC4D").queue(); //
-                                    message.addReaction("✋").queue(); //
-                                    message.addReaction("\uD83D\uDC4E").queue(); //
+                                    message.addReaction(Emoji.fromFormatted("\uD83D\uDC4D")).queue(); //
+                                    message.addReaction(Emoji.fromFormatted("✋")).queue(); //
+                                    message.addReaction(Emoji.fromFormatted("\uD83D\uDC4E")).queue(); //
                                 }
                             );
 
@@ -453,10 +451,9 @@ public class EvaluationCommand extends Command {
 return false;
     }
 
-    private static String getRobloxUsernameFromId(Long id) {
+    private String getRobloxUsernameFromId(Long id) {
         try {
-            JSONObject json = readJsonFromUrl("https://api.roblox.com/users/" + id);
-            return json.getString("Username");
+            return avaire.getRobloxAPIManager().getUserAPI().getUsername(id);
         } catch (Exception e) {
             return "Unknown";
         }

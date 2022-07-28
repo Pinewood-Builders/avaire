@@ -31,10 +31,9 @@ import com.pinewoodbuilders.handlers.adapter.*;
 import com.pinewoodbuilders.metrics.Metrics;
 import com.pinewoodbuilders.pinewood.adapter.WhitelistEventAdapter;
 import com.pinewoodbuilders.utilities.CacheUtil;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.ThreadChannel;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.ReconnectedEvent;
@@ -44,11 +43,10 @@ import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.channel.update.ChannelUpdateNameEvent;
 import net.dv8tion.jda.api.events.channel.update.ChannelUpdatePositionEvent;
 import net.dv8tion.jda.api.events.channel.update.ChannelUpdateRegionEvent;
-import net.dv8tion.jda.api.events.emote.EmoteRemovedEvent;
-import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
-import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
-import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
-import net.dv8tion.jda.api.events.guild.GuildUnbanEvent;
+import net.dv8tion.jda.api.events.emoji.EmojiRemovedEvent;
+import net.dv8tion.jda.api.events.guild.*;
+import net.dv8tion.jda.api.events.guild.invite.GuildInviteCreateEvent;
+import net.dv8tion.jda.api.events.guild.invite.GuildInviteDeleteEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateNameEvent;
@@ -60,7 +58,6 @@ import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEven
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.events.message.*;
-import net.dv8tion.jda.api.events.message.react.GenericMessageReactionEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.events.role.GenericRoleEvent;
@@ -368,7 +365,7 @@ public class MainEventHandler extends EventHandler {
     }
 
     @Override
-    public void onEmoteRemoved(EmoteRemovedEvent event) {
+    public void onEmojiRemoved(@NotNull EmojiRemovedEvent event) {
         reactionEmoteEventAdapter.onEmoteRemoved(event);
     }
 
@@ -415,14 +412,7 @@ public class MainEventHandler extends EventHandler {
         }
     }
 
-    private boolean isValidMessageReactionEvent(GenericMessageReactionEvent event) {
-        return event.isFromGuild() && event.getReactionEmote().isEmote();
-    }
 
-/*    private boolean isValidReportChannel(MessageReactionAddEvent event) {
-        return event.getChannel().getId().equals(Constants.PBST_REPORT_CHANNEL) || event.getChannel().getId().equals(Constants.PET_REPORT_CHANNEL)
-                || event.getChannel().getId().equals(Constants.TMS_REPORT_CHANNEL) || event.getChannel().getId().equals(Constants.PB_REPORT_CHANNEL) || event.getChannel().getName().equals("handbook-violator-reports");
-    }*/
 
     private void prepareGuildMembers(GenericEvent event) {
         if (event instanceof GenericMessageEvent genericMessageEvent) {
@@ -487,13 +477,13 @@ public class MainEventHandler extends EventHandler {
 
     private boolean isValidMessageReactionEvent(MessageReactionAddEvent event) {
         return event.isFromGuild()
-            && (event.getReactionEmote().isEmoji() || event.getReactionEmote().isEmote())
+            && (event.getEmoji().getType().equals(Emoji.Type.UNICODE) || event.getEmoji().getType().equals(Emoji.Type.CUSTOM))
             && !event.getMember().getUser().isBot();
     }
 
     private boolean isValidMessageReactionEvent(MessageReactionRemoveEvent event) {
         return event.isFromGuild()
-            && event.getReactionEmote().isEmote();
+            && event.getEmoji().getType().equals(Emoji.Type.CUSTOM);
     }
 
 }
